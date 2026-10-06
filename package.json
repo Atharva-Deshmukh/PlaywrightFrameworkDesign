@@ -1,0 +1,12 @@
+{
+  "name": "PlaywrightFrameworkDesign",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Atharva Deshmukh <atharva.deshmukh@siemens.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.4"
+  },
+  "scripts": {}
+}

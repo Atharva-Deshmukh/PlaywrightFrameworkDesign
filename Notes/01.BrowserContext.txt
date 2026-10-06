@@ -1,0 +1,19 @@
+Browser
+  ├── Context 1 → User 1
+  │     ├── Page 1
+  │     └── Page 2
+  │
+  └── Context 2 → User 2
+        ├── Page 1
+        └── Page 2
+
+Browser → actual browser instance.
+BrowserContext → isolated browser session/profile -> Incongnito mode
+Page → a tab/window within a context.
+Multiple pages can exist inside one context.
+Multiple contexts can exist inside one browser.
+Contexts are isolated from each other.
+browser.newContext() creates a non-persistent context by default.
+Non-persistent context data is not written to disk.
+If a page opens a popup using window.open(), the popup belongs to the same BrowserContext as the parent page.
+Use separate contexts when you need independent users/sessions.
