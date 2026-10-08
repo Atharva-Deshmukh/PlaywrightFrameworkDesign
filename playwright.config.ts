@@ -1,12 +1,19 @@
 import { defineConfig, devices } from '@playwright/test';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
+/*
+This file loads first before any other file, hence process.env is already populated by the time other files are read 
+ 
+dotenv loads key-value pairs of .env file we passed, to the process.env.
+And since config.ts is loaded first, that process.env is available everywhere
+
+Why __dirname?
+Without it, dotenv.config() defaults to looking for Secrets.env in process.cwd().
+It breaks if you ever run Playwright from a different working directory (e.g.  a CI job that cds elsewhere).
+__dirname makes it location-independent and anchors the path.
  */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.resolve(__dirname, 'Secrets.env') }); /* c:\LEARNING_REPOS\PlaywrightFrameworkDesign\Secrets.env */
 
 /**
  * See https://playwright.dev/docs/test-configuration.

@@ -21,4 +21,4 @@ export const APP_CONSTANTS = {
     FIREFOX: 'firefox',
     WEBKIT: 'webkit'
   }
-} as const;
+};

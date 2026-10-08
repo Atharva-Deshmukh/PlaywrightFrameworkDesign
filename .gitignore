@@ -1,5 +1,6 @@
-CompanyFramework/
+CompanyFramework
 Secrets.env
+user-secret.json
 
 # Playwright
 node_modules/
