@@ -1,6 +1,7 @@
 CompanyFramework
 Secrets.env
 user-secret.json
+.auth/
 
 # Playwright
 node_modules/
@@ -9,3 +10,4 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+.playwright-mcp
