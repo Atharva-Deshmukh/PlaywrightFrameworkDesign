@@ -47,7 +47,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
+    baseURL: 'https://practicesoftwaretesting.com',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -56,18 +56,37 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      /* Runs tests/auth.setup.ts once per run: logs in, saves storageState to .auth/*.json */
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+
+    {
+      /* Only spec files under tests/stable/** */
+      name: 'stable',
+      testMatch: '**/stable/**/*.spec.ts',
+      use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
+      fullyParallel: true,
+    },
+
+    {
+      /* Authenticated contexts are created per-test by tests/fixtures.ts (adminPage), not here */
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
     },
 
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
+      dependencies: ['setup'],
     },
 
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+      dependencies: ['setup'],
     },
 
     /* Test against mobile viewports. */
