@@ -3,7 +3,10 @@ import userSecrets from "./user-secret.json";
 
 // User Registry
 export const USERS = {
-    admin_user_1: "admin.user.1@gmail.com",
+    admin_user_1: {
+        email: "admin@practicesoftwaretesting.com",
+        displayName: "John Doe",
+    },
 } as const; //  it's there to make the registry immutable. Without it, this would become a string
 
 /*
@@ -13,9 +16,10 @@ export const USERS = {
 export type UserKey = keyof typeof USERS;
 
 export function getUser(userKey: UserKey) {
-    const email = USERS[userKey];
+    const { email, displayName } = USERS[userKey];
     return {
         userName: email,
+        displayName,
 
         /*
             process.env.PASSWORD reads the PASSWORD value loaded into environment variables (from Secrets.env via dotenv.config() 
