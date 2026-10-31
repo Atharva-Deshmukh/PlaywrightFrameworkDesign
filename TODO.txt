@@ -1,0 +1,5 @@
+Stage-1: Auth setup and test - UI + API
+Stage-2: E2E tests of https://practicesoftwaretesting.com/
+Stage-3: Remaining tests of https://practice.expandtesting.com/ or some other site for practicing critical things like window popups
+Stage-4: Github actions setup - Nightly pipelines
+Stage-5: Integrate AI agent skills like add API - Refer project Framework
