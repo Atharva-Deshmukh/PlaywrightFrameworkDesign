@@ -66,7 +66,7 @@ export default defineConfig({
       name: 'stable',
       testMatch: '**/stable/**/*.spec.ts',
       use: { ...devices['Desktop Chrome'] },
-      dependencies: ['setup'],
+      dependencies: ['setup'], /* Runs setup's authstate first to create and store auth states */
       fullyParallel: true,
     },
 

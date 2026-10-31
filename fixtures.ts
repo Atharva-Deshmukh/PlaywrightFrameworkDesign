@@ -1,9 +1,9 @@
 import { test as base, Browser, BrowserContext, Page } from "@playwright/test";
 import * as fs from "node:fs";
-import { UserKey, getUser } from "../Users";
+import { UserKey, getUser } from "./Users";
 
 export type MyFixtures = {
-    adminPage: Page;
+    adminUser: Page;
     // add more users as needed - mirror the pattern below with a new userKey
 };
 
@@ -93,8 +93,8 @@ test("some test", async ({ adminPage }) => {
 import { test } from "../tests/fixtures";
 import { expect, Locator } from "@playwright/test";
 
-test("some test", async ({ adminPage }) => {
-    const button: Locator = adminPage.locator('[data-test="login-submit"]');
+test("some test", async ({ adminUser }) => {
+    const button: Locator = adminUser.locator('[data-test="login-submit"]');
     await expect(button).toBeVisible();
 });
 
@@ -102,5 +102,5 @@ test("some test", async ({ adminPage }) => {
 export * from "@playwright/test";
 
 export const test = base.extend<MyFixtures>({
-    adminPage: userFixture("admin_user_1"),
+    adminUser: userFixture("admin_user_1"),
 });

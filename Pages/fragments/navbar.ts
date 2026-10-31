@@ -1,5 +1,5 @@
 import { Page, expect } from "@playwright/test";
-import { APP_CONSTANTS } from "../../appConstants";
+import { APP_CONSTANTS } from "../../constants/appConstants";
 import { HomePage } from "../homePage";
 
 /* Encapsulates the top navigation bar, shared across all pages */
@@ -33,7 +33,12 @@ export class Navbar {
 
 	// Confirms the navbar still shows the given user's exact display name (e.g. after restoring a saved session)
 	async verifyLoggedInAs(displayName: string): Promise<void> {
-		await expect(this.page.locator(this.selectors.userMenuButton)).toHaveText(displayName);
-		console.log(`✅ Confirmed logged in as: ${displayName}`);
+		try {
+			await expect(this.page.locator(this.selectors.userMenuButton)).toHaveText(displayName);
+			console.log(`✅ User: ${displayName} is visible in navbar`);
+		} catch (error) {
+			console.log(`❌ User: ${displayName} is not visible in navbar`);
+			throw error;
+		}
 	}
 }

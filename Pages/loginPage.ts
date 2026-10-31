@@ -1,8 +1,8 @@
 import { Page, expect } from "@playwright/test";
 // import { generate, createGuardrails } from "otplib"; // MFA commented out for now
-import { APP_CONSTANTS } from "../appConstants"
+import { APP_CONSTANTS } from "@constants/appConstants"
 import { UserKey, getUser } from "../Users";
-import { Navbar } from "./fragments/navbar";
+import { Navbar } from "@pages/fragments/navbar";
 
 // practicesoftwaretesting.com issues 10-byte (80-bit) TOTP secrets; otplib v13 defaults to a 16-byte minimum.
 // const mfaGuardrails = createGuardrails({ MIN_SECRET_BYTES: 10 }); // MFA commented out for now
@@ -32,15 +32,15 @@ export class LoginPage {
 
 	/**
 	 *
-	 * @param userEmail - The user key from the registry.
+	 * @param userKey - The user key from the registry.
 	 */
-	async handleLogin(userEmail: UserKey) {
+	async handleLogin(userKey: UserKey) {
 
 		const currentUrl = this.page.url();
-		const userData = getUser(userEmail);
+		const userData = getUser(userKey);
 		console.log(`Logging in as ${userData.userName}`);
 
-        await expect(this.page).toHaveURL("https://practicesoftwaretesting.com/auth/login");
+        await expect(this.page).toHaveURL("/auth/login"); // Resolved against baseURL (playwright.config.ts)
 
 		if (!currentUrl.includes('auth/login')) {
 			throw new Error(`Expected to be on login page, but got: ${currentUrl}`);
@@ -79,6 +79,10 @@ export class LoginPage {
 
         // Navigate Home via the navbar; it verifies the storefront loads internally
         await this.navbar.clickHome();
+
+		/* Verify current user logged in */
+        await this.navbar.verifyLoggedInAs(userData.displayName);
+		console.log(`✅ Post-MFA redirect complete to: ${this.page.url()}`);
 	}
 
 	// MFA commented out for now - using seeded default account (admin@practicesoftwaretesting.com) which has no MFA enabled

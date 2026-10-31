@@ -1,8 +1,8 @@
 import { test as setup, Page } from "@playwright/test";
-import { LoginPage } from "../Pages/loginPage";
+import { LoginPage } from "@pages/loginPage";
 import { UserKey, getUser } from "../Users";
 
-// serial execution to prevent auth state conflicts
+/* serial execution to prevent auth state conflicts */
 setup.describe.configure({ mode: "serial" });
 
 type SetupCase = {
@@ -12,7 +12,6 @@ type SetupCase = {
 
 const SETUP_CASES: SetupCase[] = [
     { title: "@admin Admin User 01", userKey: "admin_user_1" },
-    // add more users as needed - mirror Users.ts USERS registry
 ];
 
 for (const setupCase of SETUP_CASES) {
