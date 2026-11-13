@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test";
 // import { generate, createGuardrails } from "otplib"; // MFA commented out for now
-import { APP_CONSTANTS } from "@constants/appConstants"
+import { BasePage } from "@pages/basePage";
 import { UserKey, getUser } from "../Users";
 import { Navbar } from "@pages/fragments/navbar";
 
@@ -9,17 +9,13 @@ import { Navbar } from "@pages/fragments/navbar";
 
 
 /* NOTE: Its there after the user has clicked Sign in button already */
-export class LoginPage {
+export class LoginPage extends BasePage {
 
-    /* Page: it can only be assigned once (in the constructor), preventing accidental reassignment later. */
-	readonly page: Page; /* readonly means it can only be assigned once (in the constructor), preventing accidental reassignment later. */
 	readonly navbar: Navbar;
 	constructor(page: Page) {
-		this.page = page;
+		super(page);
 		this.navbar = new Navbar(page);
 	}
-
-	readonly waits = APP_CONSTANTS.TIMEOUTS;
 
 	selectors = {
         emailInput: '[data-test="email"]',
