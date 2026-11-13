@@ -1,0 +1,39 @@
+in tsconfig.json
+
+inside compiler options:
+
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "target": "ES2022",
+    "module": "ES2022",
+    .
+    .
+    "lib": ["es2022", "dom"],
+    "paths": {
+      "@reporters/*": ["reporters/*"],
+      "@fixtures": ["fixtures.ts"],
+      "@testFiles/*": ["testFiles/*"],
+      "@pages/*": ["Pages/*"],
+      "@helpers/*": ["helpers/*"],
+      "@interfaces/*": ["interfaces/*"],
+      "@interfaces": ["interfaces/index"],
+      "@constants/*": ["constants/*"],
+      "@testdata/*": ["testdata/*"],
+    },
+
+    These are called path aliases, also known as path mapping.
+    baseUrl is the root they resolve from.
+
+How it works
+------------
+baseUrl: "./" makes every mapped path relative to the project root.
+
+import { HomePage } from "../../Pages/homePage";   // relative path, breaks when the file moves
+import { HomePage } from "@pages/homePage";        // alias, same from any folder
+
+Why use them
+------------
+Imports don't depend on how deep the current file is.
+Moving a file doesn't break its imports.
+You can tell at a glance which layer you're importing from (pages, helpers, constants).
