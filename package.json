@@ -5,10 +5,16 @@
   "author": "Atharva Deshmukh <atharva.deshmukh@siemens.com>",
   "license": "MIT",
   "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@playwright/test": "^1.63.0",
-    "@types/node": "^26.6.4"
+    "@types/node": "^26.6.4",
+    "husky": "^9.1.7"
   },
-  "scripts": {},
+  "scripts": {
+    "prepare": "husky",
+    "lint:commit": "commitlint --from=origin/master --format ./commitlint.formatter.js"
+  },
   "dependencies": {
     "dotenv": "^18.0.6",
     "otplib": "^13.5.0",

@@ -1,0 +1,115 @@
+COMMIT MESSAGE RULES (commitlint + husky)
+
+Goal: a good message is accepted, a bad one is rejected BEFORE the commit is made.
+
+  fix: someFixHere        -> accepted
+  somethingFixed          -> rejected, with a plain-English explanation (section 3)
+
+--------------------------------------------------------------------------------
+1. HOW IT WORKS
+--------------------------------------------------------------------------------
+
+  git commit -m "message"
+        |
+        v
+  .husky/commit-msg            (git hook, runs on every commit)
+        |
+        v
+  commitlint --edit <msg file> --format ./commitlint.formatter.js
+        |
+        v
+  Rules from commitlint.config.js
+  (extends @commitlint/config-conventional)
+        |
+   +----+----+
+   |         |
+  valid    invalid
+   |         |
+   v         v
+  commit    commit is NOT created, commitlint.formatter.js prints a
+  created   readable explanation (what to fix, format, types, examples)
+
+--------------------------------------------------------------------------------
+2. WHAT EACH PIECE DOES
+--------------------------------------------------------------------------------
+  Piece                              Role
+  ---------------------------------  ------------------------------------------
+  @commitlint/cli                    The checker that reads the message
+  @commitlint/config-conventional    The rule set (Conventional Commits)
+  husky                              Installs and runs git hooks from .husky/
+  commitlint.config.js               Says: use config-conventional
+  commitlint.formatter.js            Turns rule names into readable messages
+                                     (type list is read from the rule set)
+  .husky/commit-msg                  Hook file:
+                                     npx --no -- commitlint --edit $1
+                                       --format ./commitlint.formatter.js
+  package.json "prepare": "husky"    Re-installs the hook on every npm install
+                                     (so a fresh clone is protected too)
+  package.json "lint:commit"         commitlint --from=origin/master
+                                       --format ./commitlint.formatter.js
+                                     (checks all commits since master)
+
+--------------------------------------------------------------------------------
+3. MESSAGE FORMAT AND WHAT YOU SEE WHEN IT FAILS
+--------------------------------------------------------------------------------
+  type(optional-scope): subject
+
+  Example                                   Result / "What to fix" line
+  ----------------------------------------  -----------------------------------
+  fix: someFixHere                          Accepted
+  feat(topBanner): add testing guide close  Accepted
+  docs: add commit lint notes               Accepted
+  somethingFixed                            No "type: " prefix found. Start the
+                                            message with a type, e.g.
+                                            "fix: correct navbar locator".
+  fix:                                      Missing the subject, i.e. the text
+                                            after "type: ".
+  fix: someFixHere..                        Remove the full stop (.) at the end
+                                            of the subject.
+  Fix: Something Wrong                      The type must be lower case. The
+                                            subject must not be Sentence case,
+                                            Start Case, PascalCase or UPPER
+                                            CASE.
+  wip: stuff                                Unknown type. Use one of: build,
+                                            chore, ci, docs, feat, fix, perf,
+                                            refactor, revert, style, test.
+
+  Full output for "somethingFixed":
+
+    ✖ Commit rejected: the message does not follow the Conventional Commits format.
+
+      Your message : somethingFixed
+
+      What to fix:
+        - No "type: " prefix found. Start the message with a type, e.g. "fix: correct navbar locator".
+
+      Expected format : type(optional-scope): subject
+      Allowed types   : build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test
+
+      Good examples:
+        fix: correct navbar logo locator
+        feat(topBanner): add testing guide close
+        docs: add commit lint notes
+
+    husky - commit-msg script failed (code 1)
+
+  Default commitlint output (before the formatter) was cryptic:
+    subject may be empty [subject-empty]
+    type may be empty [type-empty]
+
+--------------------------------------------------------------------------------
+4. ALLOWED TYPES
+--------------------------------------------------------------------------------
+  Type       Use for
+  ---------  ----------------------------------------------------------------
+  feat       New feature (e.g. a new fragment or page method)
+  fix        Bug fix (e.g. wrong locator)
+  docs       Documentation / notes only
+  style      Formatting only, no logic change
+  refactor   Code change that neither fixes a bug nor adds a feature
+  perf       Performance improvement
+  test       Adding or changing tests
+  build      Build system or dependencies (package.json, lockfiles)
+  ci         CI pipeline files (e.g. GitHub Actions)
+  chore      Other housekeeping
+  revert     Reverts an earlier commit
