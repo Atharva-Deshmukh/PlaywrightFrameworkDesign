@@ -1,0 +1,81 @@
+READ ONLY PROPERTIES
+--------------------
+
+export class ChatWidget {
+
+	readonly page: Page;
+	readonly waits = APP_CONSTANTS.TIMEOUTS;
+
+	constructor(page: Page) {
+
+		/* 
+		  TypeScript allows a readonly property to be assigned in two places: at its declaration, 
+		  and inside the constructor of the same class. 
+		  Anywhere else, assignment is a compile error.
+		*/
+		this.page = page;
+	}
+
+	private readonly selectors = {
+		toggleButton: '[data-test="chat-toggle"]',
+		chatWindow: '[data-test="chat-window"]',
+		closeButton: '[data-test="chat-close"]',
+	};
+}
+
+--------------------------------------------------------------------------------------------
+GETTERS (and a little on SETTERS) IN TYPESCRIPT
+--------------------------------------------------------------------------------------------
+
+- A method that is READ like a property.
+- Called without () --> obj.name, not obj.name()
+- Runs its code on EVERY read --> Not cached unless you cache it
+- No, a getter does not require a corresponding setter in TypeScript. 
+  In fact, writing a get accessor without a set accessor is a standard 
+  way to make a property read-only.
+
+class GetterSetter {
+    private val: number; 
+
+    constructor(val: number) {
+        this.val = val;
+    }
+
+    get value() {
+        return this.val;
+    }
+
+    set value(valInput) {
+        this.val = valInput;
+    }
+}
+
+let obj = new GetterSetter(10);
+
+console.log(obj.value); // 10
+obj.value = 20;
+console.log(obj.value); // 20
+
+
+  Getter           await expect(chat.chatWindow).toBeVisible();
+                   chat.chatWindow.getByRole('button').first().click();
+
+  async method     await expect(await chat.chatWindow()).toBeVisible();
+                   (await chat.chatWindow()).getByRole('button')...
+
+
+For static values like Locators or initializations, we can use getter instead of async function.
+This avoids an extra await that we have to add in expect()
+
+
+--------------------------------------------------------------------------------------------
+LAZY-INITIALIZATION
+--------------------------------------------------------------------------------------------
+
+this.navbar ??= new Navbar(this.page);
+
+                      means
+
+if (this.navbar == null || this.navbar == undefined) {
+  this.navbar = new Navbar(this.page);
+}
