@@ -1,8 +1,16 @@
+---
+name: goal-of-this-repo
+description: 'Why this repo exists and what it must achieve: a portfolio-level Playwright framework for https://practicesoftwaretesting.com/ that mirrors the company framework and is explainable in interviews. Use when: starting ANY task or chat in this repo, designing or reviewing framework structure, deciding scope or what to add next. Triggers: "goal of this repo", "repo goal", "what are we building", "goal-of-this-repo"'
+user-invocable: true
+---
+
 # Goal of This Repo
+
+**Read this skill first for every task in this repo.**
 
 ## About Me
 
-Refer: [About me.md](./About%20me.md)
+Refer: [about-me skill](../about-me/SKILL.md)
 
 ## Goal of Creating This Repository
 
@@ -21,7 +29,7 @@ I want to create a Playwright automation framework from scratch that:
 
 ## Framework Must-Haves
 
-Refer: [Framework must haves.md](./Framework%20must%20haves.md)
+Refer: [framework-must-haves skill](../framework-must-haves/SKILL.md)
 
 ## My Thought Process About This Framework
 

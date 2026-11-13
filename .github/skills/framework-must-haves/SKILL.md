@@ -1,3 +1,9 @@
+---
+name: framework-must-haves
+description: 'Checklist of what the Playwright framework in this repo must include (UI/API/hybrid tests, POM, fixtures, auth state reuse, reporting, CI/CD, Docker, parallel runs, scenarios to cover). Use when: planning or reviewing framework features, deciding what to build next, checking coverage against the must-have list. Triggers: "must haves", "framework checklist", "what is missing", "framework-must-haves"'
+user-invocable: true
+---
+
 # Playwright Framework from Scratch
 
 ## Framework Overview

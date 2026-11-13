@@ -1,0 +1,58 @@
+AGENT INTEGRATION IN THIS REPO (PlaywrightFrameworkDesign)
+How the files in .github/ and the Playwright MCP make Copilot work on THIS framework.
+--------------------------------------------------------------------------------
+
+  .github/
+    copilot-instructions.md              Always loaded. Tells Copilot to read the
+                                         goal skill first.
+    skills/
+      goal-of-this-repo/SKILL.md         Why the repo exists, target site, scope, references. READ FIRST.
+      about-me/SKILL.md                  Owner background: SDET-2, 3.5 yrs, target roles, skills.
+      framework-must-haves/SKILL.md      Checklist: UI/API/hybrid tests, POM, fixtures, auth state, CI/CD, Docker...
+
+    CompanyFramework/FOLDER_STUCTURE.txt Reference only (company repo layout)
+
+    PlaywrightConceptsCovered/*.xlsx     Reference only (concept sheets)
+
+  Tools used in chats: Playwright MCP (opens practicesoftwaretesting.com)
+
+--------------------------------------------------------------------------------
+HOW THE FILES CONNECT
+--------------------------------------------------------------------------------
+
+  Every chat in this repo
+          |
+          v
+  +--------------------------------------+
+  | .github/copilot-instructions.md      |   always loaded
+  | "Read goal-of-this-repo skill first" |
+  +--------------------------------------+
+          |
+          v
+  +--------------------------------------+
+  | skills/goal-of-this-repo/SKILL.md    |
+  | goal, target site, references        |
+  +--------------------------------------+
+          |                    |
+          v                    v
+  +------------------+   +--------------------------------+
+  | skills/about-me/ |   | skills/framework-must-haves/   |
+  | who I am, goals  |   | what the framework must contain|
+  +------------------+   +--------------------------------+
+          |                    |
+          +---------+----------+
+                    v
+        Copilot now knows: portfolio-level Playwright framework,
+        practicesoftwaretesting.com, POM + industry standards,
+        not over-complicated, explainable in interviews.
+
+--------------------------------------------------------------------------------
+WHAT EACH FILE CHANGES IN COPILOT'S ANSWERS
+--------------------------------------------------------------------------------
+  File                       Effect in this repo
+  -------------------------  --------------------------------------------------
+  copilot-instructions.md    Forces the goal skill to be read, so answers stay on target instead of generic.
+  goal-of-this-repo          Keeps changes simple, POM-based, interview-ready. Example: BasePage kept thin, no unused helpers.
+  about-me                   Pitches depth for a 3.5-year SDET going for Senior SDET / SDET-2 roles; notes are crisp.
+  framework-must-haves       Gives a checklist to measure progress against (auth reuse, fixtures, CI/CD, Docker, reports...).
+
