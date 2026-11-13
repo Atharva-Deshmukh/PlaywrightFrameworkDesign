@@ -1,0 +1,65 @@
+BASE PAGE vs PAGES vs FRAGMENTS   (example site: https://practicesoftwaretesting.com)
+
+Structure:
+
+  BasePage (abstract, thin)
+    ├── HomePage      extends BasePage   (/)
+    ├── LoginPage     extends BasePage   (/auth/login)
+    ├── ProductPage   extends BasePage
+    ├── RentalsPage   extends BasePage
+    └── ContactPage   extends BasePage   (/contact)
+
+  Fragments (plain classes, extend NOTHING, constructor(page: Page))
+    Navbar, Footer, ChatWidget, LiveActivity, TopBanner
+    -> a page USES them (composition), it does not inherit them.
+
+--------------------------------------------------------------------------------
+1. WHAT IS A FRAGMENT?
+--------------------------------------------------------------------------------
+A reusable UI region that appears on MANY pages and has no URL of its own.
+
+  Fragment        What it covers on practicesoftwaretesting.com
+  --------------  --------------------------------------------------------------
+  Navbar          logo, Home, Categories, Rentals, Contact, user menu
+  TopBanner       "Practice Black Box Testing & Bug Hunting" + Testing Guide /
+                  Bug Hunting buttons, "View the Documentation" strip
+  Footer          "Learn & Explore" links, privacy policy, "v2.5 | Built..." text
+  ChatWidget      "Open chat" button
+  LiveActivity    "Show live shop activity" button (stream-info widget)
+
+--------------------------------------------------------------------------------
+2. BASEPAGE vs FRAGMENT : WHAT GOES WHERE
+--------------------------------------------------------------------------------
+Rule: 
+BasePage = true of ANY page.  
+Fragment = one visible region with its own locators + actions.
+
+  Belongs in BasePage                      Belongs in a Fragment
+  ---------------------------------------  -------------------------------------
+  page, waits, baseUrl                     Locators of ONE UI region
+  goto(path), waitForPageLoad()            Actions of that region
+  getTitle(), getUrl()                     Reused by several pages
+  App-wide state (context, userKey)        Never holds page-specific logic
+  Lazy getters / wiring to fragments       One class per region
+
+  Stays in NEITHER (goes in the specific page class)
+    contact form fields -> ContactPage
+    product grid, sort dropdown -> HomePage
+    login form -> LoginPage
+
+--------------------------------------------------------------------------------
+3. PAGE vs FRAGMENT : WHY HomePage / LoginPage ARE NOT FRAGMENTS
+--------------------------------------------------------------------------------
+Both wrap UI. The difference is what they ARE, not whether they hold UI.
+
+                        Page (extends BasePage)            Fragment (plain class)
+  --------------------  ---------------------------------  -----------------------
+  Relationship          "IS A" page (inheritance)          "HAS A" (composition)
+  Own URL               Yes, you navigate to it            No
+  Used on               One page = the destination         Many pages
+  Extends               BasePage                           Nothing
+  Examples              HomePage, LoginPage, ProductPage,  Navbar, Footer,
+                        ContactPage                        ChatWidget, TopBanner
+
+Quick test: would a test goto it and say "I'm on the X page"?
+  Yes -> Page.   No, I use it while on any page -> Fragment.
