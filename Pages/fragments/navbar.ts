@@ -17,7 +17,9 @@ export class Navbar {
 
 	selectors = {
 		homeLink: '[data-test="nav-home"]',
+		logoLink: 'a.navbar-brand', // the logo has no data-test attribute
 		categoriesButton: '[data-test="nav-categories"]',
+		rentalsLink: '[data-test="nav-rentals"]',
 		contactLink: '[data-test="nav-contact"]',
 		userMenuButton: '[data-test="nav-menu"]',
 		signOutLink: '[data-test="nav-sign-out"]',
@@ -29,6 +31,17 @@ export class Navbar {
 		console.log("✅ Clicked Home from navbar");
 
 		await this.homePage.verifyHomePageIsReached();
+	}
+
+	async clickLogo(): Promise<void> {
+		await this.page.locator(this.selectors.logoLink).click();
+		console.log("✅ Clicked logo from navbar");
+	}
+
+	async openRentals(): Promise<void> {
+		await this.page.locator(this.selectors.categoriesButton).click();
+		await this.page.locator(this.selectors.rentalsLink).click();
+		console.log("✅ Opened Rentals from Categories menu");
 	}
 
 	// Confirms the navbar still shows the given user's exact display name (e.g. after restoring a saved session)

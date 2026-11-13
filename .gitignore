@@ -2,6 +2,7 @@ CompanyFramework
 Secrets.env
 user-secret.json
 .auth/
+.github
 
 # Playwright
 node_modules/
