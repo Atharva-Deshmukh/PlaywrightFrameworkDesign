@@ -1,36 +1,44 @@
 import { Page, expect } from "@playwright/test";
-import { APP_CONSTANTS } from "../../constants/appConstants";
-import { HomePage } from "../homePage";
+import { APP_CONSTANTS } from "@constants/appConstants";
 
-/* Encapsulates the top navigation bar, shared across all pages */
+/* Encapsulates the top navigation bar, shared across all pages.
+   Plain class (extends nothing, imports no page) so BasePage can expose it without a circular import. */
 export class Navbar {
 
 	readonly page: Page;
-	readonly homePage: HomePage;
 
 	constructor(page: Page) {
 		this.page = page;
-		this.homePage = new HomePage(page);
 	}
 
 	readonly waits = APP_CONSTANTS.TIMEOUTS;
 
-	selectors = {
+	private readonly selectors = {
 		homeLink: '[data-test="nav-home"]',
 		logoLink: 'a.navbar-brand', // the logo has no data-test attribute
 		categoriesButton: '[data-test="nav-categories"]',
 		rentalsLink: '[data-test="nav-rentals"]',
 		contactLink: '[data-test="nav-contact"]',
+		signInLink: '[data-test="nav-sign-in"]',
 		userMenuButton: '[data-test="nav-menu"]',
 		signOutLink: '[data-test="nav-sign-out"]',
 	};
 
+	// Callers verify the destination page themselves (e.g. HomePage.verifyHomePageIsReached())
 	async clickHome(): Promise<void> {
 		await this.page.locator(this.selectors.homeLink).waitFor({ state: 'visible', timeout: this.waits.SHORT });
 		await this.page.locator(this.selectors.homeLink).click({ force: true });
 		console.log("✅ Clicked Home from navbar");
+	}
 
-		await this.homePage.verifyHomePageIsReached();
+	async openContact(): Promise<void> {
+		await this.page.locator(this.selectors.contactLink).click();
+		console.log("✅ Opened Contact from navbar");
+	}
+
+	async clickSignIn(): Promise<void> {
+		await this.page.locator(this.selectors.signInLink).click();
+		console.log("✅ Clicked Sign in from navbar");
 	}
 
 	async clickLogo(): Promise<void> {

@@ -2,7 +2,7 @@ import { Page, expect } from "@playwright/test";
 // import { generate, createGuardrails } from "otplib"; // MFA commented out for now
 import { BasePage } from "@pages/basePage";
 import { UserKey, getUser } from "../Users";
-import { Navbar } from "@pages/fragments/navbar";
+import { HomePage } from "@pages/homePage";
 
 // practicesoftwaretesting.com issues 10-byte (80-bit) TOTP secrets; otplib v13 defaults to a 16-byte minimum.
 // const mfaGuardrails = createGuardrails({ MIN_SECRET_BYTES: 10 }); // MFA commented out for now
@@ -11,10 +11,8 @@ import { Navbar } from "@pages/fragments/navbar";
 /* NOTE: Its there after the user has clicked Sign in button already */
 export class LoginPage extends BasePage {
 
-	readonly navbar: Navbar;
 	constructor(page: Page) {
 		super(page);
-		this.navbar = new Navbar(page);
 	}
 
 	selectors = {
@@ -73,8 +71,9 @@ export class LoginPage extends BasePage {
         await expect(this.page).toHaveURL(/\/admin\/dashboard/);
         await expect(this.page.locator(this.selectors.navUserMenuButton)).toHaveText(userData.displayName);
 
-        // Navigate Home via the navbar; it verifies the storefront loads internally
+        // Navigate Home via the navbar, then confirm the storefront loaded
         await this.navbar.clickHome();
+        await new HomePage(this.page).verifyHomePageIsReached();
 
 		/* Verify current user logged in */
         await this.navbar.verifyLoggedInAs(userData.displayName);
