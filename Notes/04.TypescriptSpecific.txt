@@ -29,10 +29,8 @@ GETTERS (and a little on SETTERS) IN TYPESCRIPT
 
 - A method that is READ like a property.
 - Called without () --> obj.name, not obj.name()
-- Runs its code on EVERY read --> Not cached unless you cache it
-- No, a getter does not require a corresponding setter in TypeScript. 
-  In fact, writing a get accessor without a set accessor is a standard 
-  way to make a property read-only.
+- A getter does not require a corresponding setter in TypeScript. 
+  Writing a get accessor without a set accessor is a standard way to make a property read-only.
 
 class GetterSetter {
     private val: number; 

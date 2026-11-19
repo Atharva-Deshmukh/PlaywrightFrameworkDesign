@@ -3,15 +3,7 @@
    In Playwright, fixtures are reusable setup and teardown environments (dependency injection). 
    In Cypress, fixtures are static test data files (like JSON or images) used to mock data.
 
-   | Feature              | Playwright Fixtures                                                        | Cypress Fixtures                                                            |
-   |----------------------|----------------------------------------------------------------------------|-----------------------------------------------------------------------------|
-   | Primary Purpose      | Environment setup, teardown, and dependency injection                      | Storing static mock data and test inputs                                    |
-   | What They Are        | Code functions/objects passed into tests (e.g., `{ page }`, `{ request }`) | External files (`.json`, `.csv`, `.png`) stored in `cypress/fixtures/`      |
-   | How They Are Used    | Injected as arguments into `test('name', async ({ myFixture }) => ...)`    | Loaded via command `cy.fixture('users.json')` or `cy.intercept()`           |
-   | Lifecycle & Scope    | Isolated per test or worker; handles automatic cleanup after tests finish  | Static files; no built-in lifecycle, state management, or teardown          |
-   */
-
-/* Every fixture function passed to test.extend({...}) must have this exact signature:
+   Every fixture function passed to test.extend({...}) must have this exact signature:
 
     async (fixtures, use, testInfo?) => { ... }
 

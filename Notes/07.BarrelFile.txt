@@ -2,7 +2,8 @@ interfaces/index.ts
 
 /*
 	What is a barrel file?
-	A barrel file is an index.ts that re-exports everything from a folder, so the folder can be imported from one single path.
+	A barrel file is an index.ts that re-exports everything from a folder, so the folder 
+	can be imported from one single path.
 
 	Utility:
 
