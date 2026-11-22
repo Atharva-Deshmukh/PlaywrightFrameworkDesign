@@ -77,3 +77,18 @@ this.navbar ??= new Navbar(this.page);
 if (this.navbar == null || this.navbar == undefined) {
   this.navbar = new Navbar(this.page);
 }
+
+
+
+--------------------------------------------------------------------------------------------
+NULLISH COALESCING (??) WITH ENVIRONMENT VARIABLES
+--------------------------------------------------------------------------------------------
+
+/*
+  process.env.PASSWORD reads the PASSWORD value loaded into environment variables (from Secrets.env via dotenv.config() 
+  in playwright.config.ts, or a real CI env var). Since environment variables are always string | undefined, ?? "" 
+  is the nullish-coalescing operator: if process.env.PASSWORD is undefined (not set), 
+  fall back to an empty string "" instead of returning undefined.
+*/
+
+  password: process.env.PASSWORD ?? "",
