@@ -8,8 +8,18 @@
     async (fixtures, use, testInfo?) => { ... }
 
     First argument (fixtures) — An object you destructure to declare which other fixtures this fixture depends on. 
-    Second argument (use) — "hands over" the value to fixture
+    Second argument (use) —  Calling use(x) means: "here is the fixture's value, so run the test with it now."
     Code after await use(...) — Documented place for teardown
+
+    The fixture is test-scoped by default. It runs once for each test.
+    For a fixture to run once per worker or for the whole run, you'd have to declare it with { scope: 'worker' }.
+
+    (once)       setup project: login every user → write .auth/*.json
+
+    (per test)   fixture setup:   read file → newContext({ storageState }) → newPage
+                                (if the file is missing or unusable: log in first)
+                use(pm):         ⏸ fixture pauses, test body runs with pm
+                fixture teardown: lose the context
 
 */
 
@@ -28,6 +38,7 @@ export const test = base.extend<MyFixtures>({
         await todoPage.addToDo('item2');
 
         // Use the fixture value in the test -> value returned here is returned in todoPage fixture >> which is returned in test({todoPage})
+        //  Calling use(x) means: "here is the fixture's value, so run the test with it now."
         await use(todoPage);
 
         // Clean up the fixture -> below use(), we write teardown code for this fixture
