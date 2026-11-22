@@ -2,6 +2,13 @@ import { test as setup, Page } from "@playwright/test";
 import { LoginPage } from "@pages/loginPage";
 import { UserKey, getUser } from "../Users";
 
+/* 
+It opens a fresh context.
+It goes to /auth/login and runs LoginPage.handleLogin(userKey). It retries up to 3 times.
+It calls context.storageState({ path }). That writes the cookies and localStorage, including the JWT, to .auth/<userKey>.json.
+It closes the context.
+*/
+
 /* serial execution to prevent auth state conflicts */
 setup.describe.configure({ mode: "serial" });
 
@@ -21,9 +28,9 @@ for (const setupCase of SETUP_CASES) {
 
         try {
             await authenticateUser(page, setupCase.userKey);
-            await context.storageState({ path: getUser(setupCase.userKey).path });
+            await context.storageState({ path: getUser(setupCase.userKey).path, indexedDB: true });
         } finally {
-            await context.close();
+            await context.close(); // used finally => runs even if login fails, so no leaked browser context
         }
     });
 }

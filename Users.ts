@@ -31,17 +31,7 @@ export function getUser(userKey: UserKey) {
         password: process.env.PASSWORD ?? "",
         mfaSecret: (userSecrets as Record<string, string>)[email],
 
-        /* This just builds the path that will be used while session restore
-
-           page.context().storageState({ path: getUser('admin_user_1').path }).
-
-           __dirname is a Node.js variable available automatically in CommonJS modules that holds the absolute path of the folder 
-           containing the current file — here, PlaywrightFrameworkDesign, since that's where Users.ts lives. 
-           It's used instead of a relative path like ./.auth so the path resolves correctly regardless of what 
-           directory you run the command from.
-
-           c:\LEARNING_REPOS\PlaywrightFrameworkDesign\.auth\admin_user_1.json
-        */
+        /* c:\LEARNING_REPOS\PlaywrightFrameworkDesign\.auth\admin_user_1.json */
         path: path.join(__dirname, ".auth", `${userKey}.json`),
     };
 }

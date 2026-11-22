@@ -13,6 +13,7 @@
   },
   "scripts": {
     "prepare": "husky",
+    "test:preflight": "playwright test --project=auth-preflight",
     "lint:commit": "commitlint --from=origin/master --format ./commitlint.formatter.js"
   },
   "dependencies": {

@@ -56,6 +56,15 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      /* Fast-fail gate, run on its own first (e.g. in CI): npx playwright test --project=auth-preflight */
+      name: 'auth-preflight',
+      testMatch: '**/preflight/**/*.spec.ts',
+      use: { ...devices['Desktop Chrome'] },
+      workers: 1,
+      retries: 0,
+    },
+
+    {
       /* Runs tests/auth.setup.ts once per run: logs in, saves storageState to .auth/*.json */
       name: 'setup',
       testMatch: /.*\.setup\.ts/,
@@ -75,18 +84,21 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
       dependencies: ['setup'],
+      testIgnore: '**/preflight/**',
     },
 
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
       dependencies: ['setup'],
+      testIgnore: '**/preflight/**',
     },
 
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
       dependencies: ['setup'],
+      testIgnore: '**/preflight/**',
     },
 
     /* Test against mobile viewports. */

@@ -1,10 +1,10 @@
-import { test as base, Browser, BrowserContext, Page } from "@playwright/test";
+import { test as base, Browser, BrowserContext } from "@playwright/test";
 import * as fs from "node:fs";
 import { UserKey, getUser } from "./Users";
+import { PageManager } from "@helpers/pageManager";
 
 export type MyFixtures = {
-    adminUser: Page;
-    // add more users as needed - mirror the pattern below with a new userKey
+    pageManager_AdminUser: PageManager;
 };
 
 function hasUsableAuthState(authPath: string): boolean {
@@ -20,87 +20,99 @@ function hasUsableAuthState(authPath: string): boolean {
     }
 }
 
-// One isolated context per test, reusing the storageState saved by tests/auth.setup.ts.
+/* Auth setup has already run and saved a state file for each user.
+   The fixture reads that file and loads it into a context. It does this per test.
+   But Every test gets a new, empty context, because contexts are isolated per test. 
+   That empty context knows nothing about the setup login. 
+   Hence we need to load the context with newContext({ storageState }). 
+   Without it, every test starts logged out, even though setup has run.
 
-/* Every fixture function passed to test.extend({...}) must have this exact signature:
-
-                async (fixtures, use, testInfo?) => { ... }
-
-    First argument (fixtures) — An object you destructure to declare which other fixtures this fixture depends on. 
-    Second argument (use) —  if use(...) is never called inside the fixture function, the test that asked for that 
-                            fixture (e.g. test('...', async ({ adminPage }) => {...})) never actually starts running its body. 
-                            Playwright is stuck waiting for the fixture setup to "hand over" the value,
-    Code after await use(...) — not required by the API, but it's the standard, documented place for teardown — runs after the test using this fixture finishes.
-
-
-    When Playwright runs your test, it needs to:
-        Run your setup code (open browser context, log in, etc.)
-        Give the resulting value (e.g. the logged-in page) to the actual test function
-        Wait for the test to finish
-        Run your cleanup code (close the context, save state, etc.)
-
-    async ({ browser }, use) => {
-        const page = await setupSomething();   // STEP 1: setup
-
-        await use(page);                       // STEP 2+3: hand `page` to the test, then PAUSE here
-                                                //           until the test body finishes running
-
-        await cleanupSomething();              // STEP 4: runs only after the test is done
-    }
-
-    If you never call use(...): Playwright never gets the value it promised the test (adminPage), 
-                                so the test that asked for adminPage just sits there waiting forever — it never actually starts.
-
+   We are reusing the storageState saved by tests/auth.setup.ts.
 */
 function userFixture(userKey: UserKey) {
     return async (
         { browser }: { browser: Browser },
-        use: (page: Page) => Promise<void>
+        use: (pageManager: PageManager) => Promise<void>
     ) => {
         const authPath = getUser(userKey).path;
-        const context: BrowserContext = await browser.newContext(
-            hasUsableAuthState(authPath) ? { storageState: authPath } : {}
-        );
+        const usable = hasUsableAuthState(authPath);
+        if (!usable) {
+            console.warn(`No usable auth state at ${authPath}, logging in ${userKey} from scratch`);
+        }
+
+        /* empty context if auth state is not usable, restored session otherwise */
+        const context: BrowserContext = await browser.newContext(usable ? { storageState: authPath } : {});
         const page = await context.newPage();
+        const pageManager = new PageManager(page, userKey);
 
         try {
-            await use(page);
+            /* No saved session to restore: log in again (the home page is public, so nothing would redirect us later)
+               and save the fresh session so the next tests restore it instead of logging in again. */
+            if (!usable) {
+                console.warn(`Login Again`);
+                await page.goto("/auth/login");
+                await pageManager.loginPage().handleLogin(userKey);
+
+                /* Store the updated auth state
+                   When many workers start at the same time with no file, each one may still log in and write once, 
+                   so a few logins can happen before the file settles. They all write valid sessions for the same user, 
+                   so that is harmless.
+                */
+                await context.storageState({ path: authPath });
+            }
+
+            // Tests get a PageManager bound to this user's page
+            await use(pageManager);
+
+            /*
+                // fixtures.ts
+                    pageManager_AdminUser: userFixture("admin_user_1"),
+
+                // in a test
+                    test("...", async ({ pageManager_AdminUser }) => {
+                        //                 ↑ this IS the object passed to use(...)
+                        const home = pageManager_AdminUser.homePage();
+                    });
+            */
+
+
+          // finally block = teardown here
         } finally {
-            // Refresh the saved session so later runs keep reusing a live cookie
-            await context.storageState({ path: authPath });
             await context.close();
         }
+
+
+        /* Full Order:
+
+            setup:     newContext → newPage → (if no saved state: login + save state file)
+            use(pm):   fixture paused now, control passed to test() -> test runs
+            teardown:  control passed from test() -> fixture again
+                       finally {
+                        context.close()                 ← close the context
+                    }
+        
+        */
     };
 }
 
-/*
-The re-export exists purely so spec files can pull expect, Locator, Page, devices, etc. from the same import line
+/* This fixtures.ts already defines its own test. 
+   Specs import that custom test, and they also need expect, Locator and the rest. 
+   The re-export lets them get everything from one place:
 
-                                                        With this line:
-                                                        ---------------
+// with the re-export
+    import { test, expect, Locator } from "@fixtures";
 
-import { test, expect, Locator } from "../tests/fixtures";
-
-test("some test", async ({ adminPage }) => {
-    const button: Locator = adminPage.locator('[data-test="login-submit"]');
-    await expect(button).toBeVisible();
-});
+// without it, two imports
+    import { test } from "@fixtures";
+    import { expect, Locator } from "@playwright/test";
 
 
-                                                        Without this line:
-                                                        ------------------
-
-import { test } from "../tests/fixtures";
-import { expect, Locator } from "@playwright/test";
-
-test("some test", async ({ adminUser }) => {
-    const button: Locator = adminUser.locator('[data-test="login-submit"]');
-    await expect(button).toBeVisible();
-});
+export * from "@playwright/test";            // includes the original `test`
+export const test = base.extend<MyFixtures>({...});   // your own `test`
 
 */
 export * from "@playwright/test";
 
 export const test = base.extend<MyFixtures>({
-    adminUser: userFixture("admin_user_1"),
+    pageManager_AdminUser: userFixture("admin_user_1"),
 });

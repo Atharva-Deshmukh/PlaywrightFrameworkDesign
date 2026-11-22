@@ -12,7 +12,7 @@ import { HomePage } from "@pages/homePage";
 export class LoginPage extends BasePage {
 
 	constructor(page: Page) {
-		super(page);
+		super(page); // // runs BasePage's constructor with this page
 	}
 
 	selectors = {
