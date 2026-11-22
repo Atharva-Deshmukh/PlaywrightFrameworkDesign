@@ -9,3 +9,10 @@ OOPs concepts of typescript to understand
 - Abstract classes
 - getters and setters
 - constructors
+
+
+QUESTIONS:
+- same page reference is passed to everything
+- in parallel executions, how will this be managed
+- Workers concept
+- Working of parallel execution
