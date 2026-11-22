@@ -1,0 +1,27 @@
+const authFile = path.join(__dirname, '../playwright/.auth/user.json');
+
+/*
+	__dirname = Node.js variable (CommonJS, no import) holding the ABSOLUTE path of the folder
+	            containing the current file.
+
+	Line breakdown:
+		__dirname                       -> folder of the current file
+		'../playwright/.auth/user.json' -> relative path; ".." = go up one folder
+		path.join(...)                  -> joins pieces, resolves "..", uses the right OS separator
+
+	Example
+		C:\project\
+		├── tests\login.spec.ts   <- code lives here  => __dirname = C:\project\tests
+		└── data\user.json        <- file we want
+
+	Fragile: fs.readFileSync('./data/user.json')
+		"./" = folder where the COMMAND WAS RUN, not where the file is.
+		Run from C:\project        -> works
+		Run from C:\project\tests  -> file not found (also CI / other tools)
+
+	Reliable: path.join(__dirname, '../data/user.json')
+		C:\project\tests -> ".." -> C:\project -> + data\user.json = C:\project\data\user.json
+		Same result from terminal, CI or the VS Code extension.
+
+	Rule of thumb: use path.join(__dirname, ...) whenever code needs to find another project file.
+*/
