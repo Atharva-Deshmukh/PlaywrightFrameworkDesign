@@ -1,3 +1,23 @@
+--------------------
+Parent class constructor
+--------------------
+
+export abstract class BasePage {
+    readonly page: Page;
+    constructor(page: Page) {
+        this.page = page;          // parent sets up the shared state
+    }
+}
+
+export class LoginPage extends BasePage {
+    constructor(page: Page) {
+        super(page);               // runs BasePage's constructor with this page
+    }
+}
+
+
+
+--------------------
 READ ONLY PROPERTIES
 --------------------
 
