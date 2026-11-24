@@ -134,4 +134,15 @@ Only the helper is duplicated. The tab is not.
 	// test body
 	const b = pm.homePage();                       // b is another new page object, b.page is the same tab
 	await b.sortBy(option);                        // acts on that tab, which is already on the home page
+
+Typical spec file workflow:
+
+	test.beforeEach(..., async ({ pageManager_AdminUser }) => {
+    await pageManager_AdminUser.homePage().navigateToHome();   // a HomePage object is made, used once, thrown away
+	});                                                            // the TAB stays on the home URL
+
+	test("...", async ({ pageManager_AdminUser }) => {
+		const homePage = pageManager_AdminUser.homePage();         // a NEW HomePage object, pointing to the same tab
+		await homePage.clickEcoFriendlyFilter();                   // clicks in the tab that is already on home
+	});
 */
