@@ -1,0 +1,137 @@
+/*
+	PAGE OBJECTS, BASEPAGE AND PAGEMANAGER
+
+	1. What is a page object?
+	A class that represents one screen of the app: its locators + the actions and checks you can do there.
+	Tests call methods (homePage.sortBy(...)) instead of repeating selectors and clicks.
+	A UI change then touches one class, not every test.
+
+		HomePage     -> sort dropdown, search, product grid
+		RentalsPage  -> rental cards
+		LoginPage    -> email, password, submit
+
+
+	3. BasePage: what every page has in common
+	BasePage is abstract (cannot do new BasePage()). It holds what EVERY screen needs:
+		this.page, waits (timeouts), fragments (navbar, footer, chatWidget...) as lazy getters
+
+	Every page extends it and passes the page up with super(page):
+
+		export abstract class BasePage {
+			readonly page: Page;
+			constructor(page: Page) { this.page = page; }      // sets this.page on the instance
+		}
+
+		export class HomePage extends BasePage {
+			constructor(page: Page) { super(page); }           // runs BasePage's constructor
+			selectors = {...};                                 // only what is specific to the home screen
+			async sortBy(...) {...}
+		}
+
+	Only the basePage's constructor code is run. Nothing from a "BasePage page" is used. 
+	Each extended page object has its own page property.
+	- The constructor code lives in BasePage (written once).
+	- The stored value lives on each object you create (HomePage, RentalsPage, ...).
+	- Nothing is stored "in BasePage", because there is no BasePage object.
+
+	const home    = new HomePage(thePage);
+	const rentals = new RentalsPage(thePage);
+
+	BasePage's constructor ran twice, once for each object, and this was a different object each time. 
+	It wrote page onto home the first time and onto rentals the second.
+
+
+	4. PageManager: 
+
+	A test needs page objects, and every page object needs the same page:
+		const home    = new HomePage(page);
+		const product = new ProductPage(page);
+		const rentals = new RentalsPage(page);
+
+	PageManager is a factory that remembers the page. 
+	You give it the page once, and after that you just ask for the page objects you want.
+
+		const pm = new PageManager(page, userKey);   // remembers page + userKey
+
+		pm.homePage()      // new HomePage(page)
+		pm.productPage()   // new ProductPage(page)
+		pm.rentalsPage()   // new RentalsPage(page)
+
+	Flow:
+		fixture:   page = context.newPage()
+           pm   = new PageManager(page, userKey)      ← made once per test
+           use(pm)                                    ← handed to the test as pageManager_AdminUser
+
+		test:      homePage    = pm.homePage()        ← new HomePage(page)
+				rentalsPage = pm.rentalsPage()        ← new RentalsPage(page)
+
+	
+    The page goes into PageManager once, in the fixture. 
+	Every page object the test asks for gets that same value. 
+	So all of them act on the same tab with the same logged-in user, 
+	and the test never touches the raw page to build them.
+
+
+	Without pageManager:
+
+		Option A: the fixture hands over the raw page
+
+		// fixtures.ts
+		type MyFixtures = { adminPage: Page };
+		adminPage: async ({ browser }, use) => {
+			const context = await browser.newContext({ storageState: authPath });
+			const page = await context.newPage();
+			await use(page);              // the test receives the Page itself
+			await context.close();
+		}
+
+		// spec
+		test("sort", async ({ adminPage }) => {
+			const home = new HomePage(adminPage);       // the test builds each page object itself
+			const rentals = new RentalsPage(adminPage);
+			await home.sortBy(...);
+		});
+
+		Drawback: every test builds its own page objects
+
+		Option B: the fixture builds the page objects (Playwright's documented way)
+
+		// fixtures.ts
+		type MyFixtures = { homePage: HomePage; rentalsPage: RentalsPage };
+
+		export const test = base.extend<MyFixtures>({
+			homePage:    async ({ page }, use) => { await use(new HomePage(page)); },
+			rentalsPage: async ({ page }, use) => { await use(new RentalsPage(page)); },
+		});
+
+		// spec
+		test("sort", async ({ homePage, rentalsPage }) => {
+			await homePage.sortBy(...);
+		});
+
+		Drawback: With 20 pages that is 20 fixture entries.
+
+													Page vs Page object
+													-------------------
+
+What it is																	     How many in one test
+page (Playwright Page)	The real browser tab. 
+It holds the URL, the DOM, cookies and everything on screen	                     1, created by the fixture
+Page object (HomePage, LifecycleTwinApp)	
+A small helper that holds a reference to the tab, plus selectors and methods	 As many as you create
+
+Only the helper is duplicated. The tab is not.
+
+
+	// fixture, once for this test
+	page = context.newPage();                      // the one browser tab of this test
+	pm   = new PageManager(page, userKey);         // pm.page is that same tab
+
+	// beforeEach
+	const a = pm.homePage();                       // a is a new page object, a.page is that tab
+	await a.navigateToHome();                      // the tab is now on the home URL
+
+	// test body
+	const b = pm.homePage();                       // b is another new page object, b.page is the same tab
+	await b.sortBy(option);                        // acts on that tab, which is already on the home page
+*/

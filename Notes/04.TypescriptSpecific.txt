@@ -43,6 +43,71 @@ export class ChatWidget {
 	};
 }
 
+
+readonly: it can only be assigned in the constructor of the class that declares it, which here is BasePage's constructor.
+visibility:  there is no modifier, so it is public. Everyone can read it, including home.page in a test.
+
+class BasePage {
+    readonly page: Page;
+    constructor(page: Page) { this.page = page; }
+}
+
+
+class HomePage extends BasePage {
+    constructor(page: Page) {
+        super(page);          // fine: BasePage's constructor assigns it
+        this.page = page;     // ERROR: Cannot assign to 'page' because it is a read-only property
+    }
+    async foo() {
+        this.page = other;    // ERROR, same reason
+    }
+}
+
+const home = new HomePage(thePage);
+
+home.page = another;          // ERROR from outside too
+
+--------------------------------------------------------------------------------------------
+"this"
+--------------------------------------------------------------------------------------------
+
+this means "the object this code is currently running on". 
+
+Ex:
+
+class Dog {
+    name: string;
+    constructor(name: string) { this.name = name; }
+}
+const a = new Dog("Rex");    // this = a   while the constructor runs
+const b = new Dog("Fido");   // this = b   while the constructor runs
+
+The code this.name = name is written once. 
+It writes to a the first time and b the second.
+
+this is determined by what is to the left of the dot at the call, not by where the code is written:
+    home.navbar → this = home
+    rentals.navbar → this = rentals
+    new HomePage(p) → this = the new object
+
+new HomePage(thePage)
+ └─ empty object created                  ← the ONE object that exists
+     │                                       this = not available yet (no code has run)
+     ├─ HomePage constructor
+     │    │                                 this = the new HomePage object
+     │    └─ super(page)
+     │         └─ BasePage constructor
+     │                                      this = the SAME new HomePage object (no second object)
+     │                                      this.page = page  →  the new HomePage object's page = thePage
+     └─ HomePage fields (selectors = {...})
+                                            this = the new HomePage object
+                                            this.selectors = {...}  →  the new HomePage object's selectors = {...}
+
+Every this in the diagram is the same object. It is the one created at the top.
+BasePage's constructor doesn't build a separate object. It runs on that same object and adds page to it.
+After super(page) returns, the HomePage code continues and adds selectors to the same object.
+Finished object: { page: thePage, selectors: {...} }, which is what home holds.
+
 --------------------------------------------------------------------------------------------
 GETTERS (and a little on SETTERS) IN TYPESCRIPT
 --------------------------------------------------------------------------------------------
