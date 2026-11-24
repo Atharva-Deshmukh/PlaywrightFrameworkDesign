@@ -24,9 +24,11 @@
 In Playwright a fixture is created once per test.
 Playwright caches the fixture for the lifetime of one test. 
 Inside that test, the beforeEach hook, the test body and afterEach all get the same instance. 
-    Test 1:  setup fixture ─► beforeEach ─► test body ─► afterEach ─► teardown fixture
-    Test 2:  setup fixture ─► beforeEach ─► test body ─► afterEach ─► teardown fixture    ← runs AGAIN
-    Test 3:  setup fixture ─► ...                                                         ← runs AGAIN
+    fixture setup          (once)
+    beforeEach           uses the fixture
+    test body            uses the same fixture
+    afterEach            uses the same fixture
+    fixture teardown       (once, after afterEach)
 
 So the caching exists to make beforeEach and the test share one page. It doesn't skip work between tests.
 
