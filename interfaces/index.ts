@@ -17,3 +17,4 @@
 
 export type { RentalItem } from "./rentalItem";
 export type { SortOption } from "./sortOption";
+export type { ProductDetails } from "./productDetails";

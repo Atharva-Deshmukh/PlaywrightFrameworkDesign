@@ -11,3 +11,11 @@ export function parsePrice(text: string): number {
 export function normalizeText(text: string): string {
 	return text.replace(/\s+/g, ' ').trim();
 }
+
+/* Regex that matches the whole text only (ignoring surrounding whitespace), for locator hasText filters
+   where a plain string would also match longer texts, e.g. "Claw Hammer" inside "Claw Hammer with Shock Reduction Grip"
+*/
+export function exactTextPattern(text: string): RegExp {
+	const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	return new RegExp(`^\\s*${escaped}\\s*$`);
+}

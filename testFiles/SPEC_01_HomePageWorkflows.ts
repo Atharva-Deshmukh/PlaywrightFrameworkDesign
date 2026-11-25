@@ -1,5 +1,4 @@
 import { test, expect, Locator } from "@fixtures";
-import { HomePage } from "@pages/homePage";
 import { ProductPage } from "@pages/productPage";
 import { SortField, SORT_OPTIONS_BY_FIELD } from "@constants/sortOptions";
 import { pickRandom, randomIndex } from "@helpers/randomUtils";
@@ -7,7 +6,7 @@ import { pickRandom, randomIndex } from "@helpers/randomUtils";
 /**
  * HomePageWorkflows
  *
- * given an admin user's auth state has already been restored (via the adminUser fixture)
+ * given an admin user's auth state has already been restored (via the pageManager_AdminUser fixture)
  * when visiting the home page
  * then
  *   1. clicking the eco-friendly filter should load only eco-friendly products
@@ -17,23 +16,19 @@ import { pickRandom, randomIndex } from "@helpers/randomUtils";
  */
 export function HomePageWorkflows() {
 
-    let homePage: HomePage;
+    test.beforeEach('Navigate to home page', async ({ pageManager_AdminUser }) => {
 
-    test.beforeEach('Initialising classes', async ({ adminUser }) => {
-        homePage = new HomePage(adminUser);
-
-        /* The adminUser fixture only restores the saved session (cookies/localStorage) into a new
+        /* The pageManager_AdminUser fixture only restores the saved session (cookies/localStorage) into a new
            context; the page itself is still about:blank. Navigate explicitly (resolved against
            baseURL) so every test starts on the home page, already logged in.
+           Each test gets the same fixture (same page), so the navigation done here is still in place in the test.
         */
-        await homePage.navigateToHome();
+        await pageManager_AdminUser.homePage().navigateToHome();
     });
 
-    test.afterEach('Close page instances', async() => {
-        await homePage.page.close();
-    });
+    test("Verify that clicking ecofriendly filter loads all ecofriendly products", async ({ pageManager_AdminUser }) => {
+        const homePage = pageManager_AdminUser.homePage();
 
-    test("Verify that clicking ecofriendly filter loads all ecofriendly products", async () => {
         await homePage.clickEcoFriendlyFilter();
 
         const productCards: Locator = homePage.page.locator(homePage.selectors.individualProductCard);
@@ -48,7 +43,9 @@ export function HomePageWorkflows() {
         }
     });
 
-    test("Verify sorting functionality", async () => {
+    test("Verify sorting functionality", async ({ pageManager_AdminUser }) => {
+        const homePage = pageManager_AdminUser.homePage();
+
         // One random direction per field; the pick is part of the step title so a failure shows what was run
         const sortFields: Array<[string, SortField]> = [
             ['name', SortField.NAME],
@@ -66,7 +63,8 @@ export function HomePageWorkflows() {
         }
     });
 
-    test("Verify search functionality", async () => {
+    test("Verify search functionality", async ({ pageManager_AdminUser }) => {
+        const homePage = pageManager_AdminUser.homePage();
         const searchTerm = 'Sander';
         let listed: { name: string; price: number };
         let productPage: ProductPage;
@@ -83,7 +81,7 @@ export function HomePageWorkflows() {
 
             await homePage.openProductCard(index);
 
-            productPage = new ProductPage(homePage.page);
+            productPage = pageManager_AdminUser.productPage();
             await productPage.verifyProductPageIsReached();
             await productPage.verifyProductNameContains(searchTerm);
             await productPage.verifyProductImageLoaded();

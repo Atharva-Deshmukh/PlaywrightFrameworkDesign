@@ -1,7 +1,4 @@
 import { test } from "@fixtures";
-import { HomePage } from "@pages/homePage";
-import { RentalsPage } from "@pages/rentalsPage";
-import { Navbar } from "@pages/fragments/navbar";
 import { RENTAL_ITEMS } from "@testdata/rentalsData";
 
 /**
@@ -15,25 +12,17 @@ import { RENTAL_ITEMS } from "@testdata/rentalsData";
  */
 export function RentalsPageWorkflows() {
 
-    let homePage: HomePage;
-    let navbar: Navbar;
-    let rentalsPage: RentalsPage;
-
-    test.beforeEach('Initialising classes', async ({ adminUser }) => {
-        homePage = new HomePage(adminUser);
-        navbar = new Navbar(adminUser);
-        rentalsPage = new RentalsPage(adminUser);
+    test.beforeEach('Navigate to rentals page', async ({ pageManager_AdminUser }) => {
+        const homePage = pageManager_AdminUser.homePage();
 
         await homePage.navigateToHome();
-        await navbar.openRentals();
-        await rentalsPage.verifyRentalsPageIsReached();
+        await homePage.navbar.openRentals();
+        await pageManager_AdminUser.rentalsPage().verifyRentalsPageIsReached();
     });
 
-    test.afterEach('Close page instances', async () => {
-        await homePage.page.close();
-    });
+    test('Verify rentals page content', async ({ pageManager_AdminUser }) => {
+        const rentalsPage = pageManager_AdminUser.rentalsPage();
 
-    test('Verify rentals page content', async () => {
         for (const item of RENTAL_ITEMS) {
             await test.step(`Verify rental: ${item.title}`, async () => {
                 await rentalsPage.verifyRentalCard(item);
@@ -41,8 +30,8 @@ export function RentalsPageWorkflows() {
         }
     });
 
-    test('Verify logo navigation to home page from rentals page', async () => {
-        await navbar.clickLogo();
-        await homePage.verifyHomePageIsReached();
+    test('Verify logo navigation to home page from rentals page', async ({ pageManager_AdminUser }) => {
+        await pageManager_AdminUser.rentalsPage().goHomeViaLogo();
+        await pageManager_AdminUser.homePage().verifyHomePageIsReached();
     });
 }
