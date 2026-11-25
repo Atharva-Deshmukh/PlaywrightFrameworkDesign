@@ -145,4 +145,36 @@ Typical spec file workflow:
 		const homePage = pageManager_AdminUser.homePage();         // a NEW HomePage object, pointing to the same tab
 		await homePage.clickEcoFriendlyFilter();                   // clicks in the tab that is already on home
 	});
-*/
+
+
+
+Another example
+
+    test.beforeEach('Navigate to home page', async ({ pageManager_AdminUser }) => {
+        await pageManager_AdminUser.homePage().navigateToHome();
+    });
+
+    test('Verify chat widget loads with header and greeting', async ({ pageManager_AdminUser }) => {
+        const chatWidget = pageManager_AdminUser.homePage().chatWidget;
+
+        await chatWidget.open();
+        await chatWidget.verifyChatWidgetLoaded();
+    });
+
+    test('Verify Find a product functionality', async ({ pageManager_AdminUser }) => {
+        const searchTerm = 'hammer';
+        const productName = 'Claw Hammer';
+        const homePage = pageManager_AdminUser.homePage();
+        const chatWidget = homePage.chatWidget;
+        const productPage = pageManager_AdminUser.productPage();
+
+	Test 1:  new tab (about:blank) → beforeEach: goes to home → test 1 body: opens chat
+	Test 2:  new tab (about:blank) → beforeEach: goes to home → test 2 body: opens chat, runs the steps
+
+
+    beforeEach and its test share one tab. The navigation done in beforeEach is still in place when the test body starts, 
+	because both use the same fixture instance and so the same tab.
+
+	Each test starts from beforeEach's result, not from the previous test's result. 
+	Test 2 gets a brand-new tab, because the fixture is created again for every test. 
+	Whatever test 1 did, such as the open chat or the product page, is gone with its tab.
